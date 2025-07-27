@@ -7,7 +7,7 @@ package list_test
 import (
 	"fmt"
 
-	list "github.com/bahlo/generic-list-go"
+	list "github.com/PrismAIO/generic-list-go"
 )
 
 func Example() {

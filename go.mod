@@ -1,3 +1,3 @@
-module github.com/bahlo/generic-list-go
+module github.com/PrismAIO/generic-list-go
 
 go 1.18
