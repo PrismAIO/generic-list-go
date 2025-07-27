@@ -61,7 +61,6 @@ func checkListPointers[T any](t *testing.T, l *List[T], es []*Element[T]) {
 }
 
 func TestList(t *testing.T) {
-
 	// Single element list
 	{
 		l := New[string]()
@@ -291,19 +290,19 @@ func TestMove(t *testing.T) {
 
 // Test PushFront, PushBack, PushFrontList, PushBackList with uninitialized List
 func TestZeroList(t *testing.T) {
-	var l1 = new(List[int])
+	l1 := new(List[int])
 	l1.PushFront(1)
 	checkList(t, l1, []int{1})
 
-	var l2 = new(List[int])
+	l2 := new(List[int])
 	l2.PushBack(1)
 	checkList(t, l2, []int{1})
 
-	var l3 = new(List[int])
+	l3 := new(List[int])
 	l3.PushFrontList(l1)
 	checkList(t, l3, []int{1})
 
-	var l4 = new(List[int])
+	l4 := new(List[int])
 	l4.PushBackList(l2)
 	checkList(t, l4, []int{1})
 }
@@ -343,4 +342,57 @@ func TestMoveUnknownMark(t *testing.T) {
 	l1.MoveBefore(e1, e2)
 	checkList(t, &l1, []int{1})
 	checkList(t, &l2, []int{2})
+}
+
+// Test Replace method
+func TestReplace(t *testing.T) {
+	// Test basic replacement
+	l := New[int]()
+	e1 := l.PushBack(1)
+	e2 := l.PushBack(2)
+	e3 := l.PushBack(3)
+	checkListPointers(t, l, []*Element[int]{e1, e2, e3})
+
+	// Replace middle element
+	newE2 := l.Replace(20, e2)
+	checkListPointers(t, l, []*Element[int]{e1, newE2, e3})
+	if newE2.Value != 20 {
+		t.Errorf("newE2.Value = %d, want 20", newE2.Value)
+	}
+	if e2.list != nil {
+		t.Errorf("e2.list should be nil after replacement")
+	}
+
+	// Replace front element
+	newE1 := l.Replace(10, e1)
+	checkListPointers(t, l, []*Element[int]{newE1, newE2, e3})
+	if newE1.Value != 10 {
+		t.Errorf("newE1.Value = %d, want 10", newE1.Value)
+	}
+	if e1.list != nil {
+		t.Errorf("e1.list should be nil after replacement")
+	}
+
+	// Replace back element
+	newE3 := l.Replace(30, e3)
+	checkListPointers(t, l, []*Element[int]{newE1, newE2, newE3})
+	if newE3.Value != 30 {
+		t.Errorf("newE3.Value = %d, want 30", newE3.Value)
+	}
+	if e3.list != nil {
+		t.Errorf("e3.list should be nil after replacement")
+	}
+
+	// Replace replacement element
+	newE4 := l.Replace(40, newE2)
+	checkListPointers(t, l, []*Element[int]{newE1, newE4, newE3})
+	if newE4.Value != 40 {
+		t.Errorf("newE4.Value = %d, want 40", newE4.Value)
+	}
+	if newE2.list != nil {
+		t.Errorf("newE2.list should be nil after replacement")
+	}
+
+	// Check final list values
+	checkList(t, l, []int{10, 40, 30})
 }

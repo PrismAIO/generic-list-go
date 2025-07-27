@@ -5,10 +5,10 @@
 // Package list implements a doubly linked list.
 //
 // To iterate over a list (where l is a *List):
+//
 //	for e := l.Front(); e != nil; e = e.Next() {
 //		// do something with e.Value
 //	}
-//
 package list
 
 // Element is an element of a linked list.
@@ -128,6 +128,18 @@ func (l *List[T]) move(e, at *Element[T]) {
 	e.next.prev = e
 }
 
+// replace replaces element at with element e in the list.
+func (l *List[T]) replace(e, at *Element[T]) {
+	e.prev = at.prev
+	e.next = at.next
+	e.prev.next = e
+	e.next.prev = e
+	e.list = l
+	at.prev = nil
+	at.next = nil
+	at.list = nil
+}
+
 // Remove removes e from l if e is an element of list l.
 // It returns the element value e.Value.
 // The element must not be nil.
@@ -172,6 +184,20 @@ func (l *List[T]) InsertAfter(v T, mark *Element[T]) *Element[T] {
 	}
 	// see comment in List.Remove about initialization of l
 	return l.insertValue(v, mark)
+}
+
+// Replace replaces element mark with a new element containing value v and returns the new element.
+// If mark is not an element of l, the list is not modified.
+// The mark must not be nil.
+func (l *List[T]) Replace(v T, mark *Element[T]) *Element[T] {
+	if mark.list != l {
+		return nil
+	}
+
+	e := &Element[T]{Value: v}
+	l.replace(e, mark)
+
+	return e
 }
 
 // MoveToFront moves element e to the front of list l.
